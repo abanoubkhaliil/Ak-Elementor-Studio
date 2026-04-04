@@ -1,0 +1,154 @@
+<svg width="1280" height="320" viewBox="0 0 1280 320" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Main background gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0d1117"/>
+      <stop offset="60%" style="stop-color:#0d1117"/>
+      <stop offset="100%" style="stop-color:#161b22"/>
+    </linearGradient>
+    <!-- Accent glow -->
+    <radialGradient id="glow1" cx="30%" cy="50%" r="40%">
+      <stop offset="0%" style="stop-color:#f78166;stop-opacity:0.12"/>
+      <stop offset="100%" style="stop-color:#f78166;stop-opacity:0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx="75%" cy="50%" r="35%">
+      <stop offset="0%" style="stop-color:#79c0ff;stop-opacity:0.10"/>
+      <stop offset="100%" style="stop-color:#79c0ff;stop-opacity:0"/>
+    </radialGradient>
+    <!-- Card gradient -->
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#161b22"/>
+      <stop offset="100%" style="stop-color:#1c2128"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="320" fill="url(#bg)"/>
+  <rect width="1280" height="320" fill="url(#glow1)"/>
+  <rect width="1280" height="320" fill="url(#glow2)"/>
+
+  <!-- Subtle grid lines -->
+  <g stroke="#21262d" stroke-width="1" opacity="0.5">
+    <line x1="0" y1="80" x2="1280" y2="80"/>
+    <line x1="0" y1="160" x2="1280" y2="160"/>
+    <line x1="0" y1="240" x2="1280" y2="240"/>
+    <line x1="320" y1="0" x2="320" y2="320"/>
+    <line x1="640" y1="0" x2="640" y2="320"/>
+    <line x1="960" y1="0" x2="960" y2="320"/>
+  </g>
+
+  <!-- Left accent line -->
+  <rect x="0" y="0" width="4" height="320" fill="url(#accentLine)"/>
+  <defs>
+    <linearGradient id="accentLine" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f78166"/>
+      <stop offset="50%" style="stop-color:#79c0ff"/>
+      <stop offset="100%" style="stop-color:#56d364"/>
+    </linearGradient>
+  </defs>
+
+  <!-- MAIN TEXT BLOCK — LEFT SIDE -->
+  <!-- "AK" logo badge -->
+  <rect x="52" y="68" width="52" height="52" rx="12" fill="#f78166" opacity="0.15"/>
+  <rect x="52" y="68" width="52" height="52" rx="12" fill="none" stroke="#f78166" stroke-width="1.5"/>
+  <text x="78" y="103" font-family="'Segoe UI', Arial, sans-serif" font-size="22" font-weight="800" fill="#f78166" text-anchor="middle">AK</text>
+
+  <!-- Title -->
+  <text x="122" y="94" font-family="'Segoe UI', Arial, sans-serif" font-size="30" font-weight="700" fill="#ffffff">AK Elementor Studio</text>
+
+  <!-- Subtitle -->
+  <text x="122" y="122" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="400" fill="#8b949e">A Claude AI Skill by Abanoub Khalil · akstudio.me</text>
+
+  <!-- Divider -->
+  <line x1="52" y1="142" x2="580" y2="142" stroke="#30363d" stroke-width="1"/>
+
+  <!-- Description -->
+  <text x="52" y="168" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#c9d1d9">Converts any design input into production-ready</text>
+  <text x="52" y="190" font-family="'Segoe UI', Arial, sans-serif" font-size="15" fill="#c9d1d9">WordPress <tspan fill="#79c0ff" font-weight="600">Elementor</tspan> templates — importable in one click.</text>
+
+  <!-- Input type pills -->
+  <!-- Screenshot -->
+  <rect x="52" y="214" width="100" height="24" rx="12" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="102" y="231" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">📸 Screenshot</text>
+  <!-- Figma -->
+  <rect x="160" y="214" width="78" height="24" rx="12" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="199" y="231" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">🎨 Figma</text>
+  <!-- HTML/CSS -->
+  <rect x="246" y="214" width="90" height="24" rx="12" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="291" y="231" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">💻 HTML/CSS</text>
+  <!-- PDF -->
+  <rect x="344" y="214" width="64" height="24" rx="12" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="376" y="231" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">📄 PDF</text>
+  <!-- Text -->
+  <rect x="416" y="214" width="80" height="24" rx="12" fill="#21262d" stroke="#30363d" stroke-width="1"/>
+  <text x="456" y="231" font-family="'Segoe UI', Arial, sans-serif" font-size="11" fill="#8b949e" text-anchor="middle">✏️ Description</text>
+
+  <!-- Author line -->
+  <text x="52" y="276" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#6e7681">Built by </text>
+  <text x="91" y="276" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#f78166" font-weight="600">Abanoub Khalil</text>
+  <text x="196" y="276" font-family="'Segoe UI', Arial, sans-serif" font-size="12" fill="#6e7681"> · Senior WordPress &amp; Webflow Developer · Cairo, Egypt</text>
+
+  <!-- DIVIDER vertical -->
+  <line x1="660" y1="40" x2="660" y2="280" stroke="#21262d" stroke-width="1.5"/>
+
+  <!-- RIGHT SIDE — Flow diagram -->
+  <!-- Title -->
+  <text x="700" y="65" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="600" fill="#6e7681" letter-spacing="2">HOW IT WORKS</text>
+
+  <!-- Step boxes -->
+  <!-- Step 1 -->
+  <rect x="700" y="80" width="130" height="44" rx="8" fill="url(#card)" stroke="#f78166" stroke-width="1.5"/>
+  <text x="715" y="99" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#f78166">01  Input Detection</text>
+  <text x="715" y="115" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681">Image / Code / PDF / Text</text>
+  <!-- Arrow -->
+  <path d="M 830 102 L 858 102" stroke="#30363d" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 2 -->
+  <rect x="860" y="80" width="130" height="44" rx="8" fill="url(#card)" stroke="#79c0ff" stroke-width="1.5"/>
+  <text x="875" y="99" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#79c0ff">02  Analysis</text>
+  <text x="875" y="115" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681">Layout · Colors · Fonts</text>
+  <!-- Arrow down from step 2 -->
+  <path d="M 925 124 L 925 148" stroke="#30363d" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 3 -->
+  <rect x="860" y="150" width="130" height="44" rx="8" fill="url(#card)" stroke="#56d364" stroke-width="1.5"/>
+  <text x="875" y="169" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#56d364">03  Widget Mapping</text>
+  <text x="875" y="185" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681">20+ Elementor widgets</text>
+  <!-- Arrow left from step 3 -->
+  <path d="M 860 172 L 832 172" stroke="#30363d" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 4 -->
+  <rect x="700" y="150" width="130" height="44" rx="8" fill="url(#card)" stroke="#d2a8ff" stroke-width="1.5"/>
+  <text x="715" y="169" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#d2a8ff">04  JSON Generation</text>
+  <text x="715" y="185" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681">Responsive · Valid IDs</text>
+  <!-- Arrow down -->
+  <path d="M 765 194 L 765 218" stroke="#30363d" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Step 5 -->
+  <rect x="700" y="220" width="130" height="44" rx="8" fill="url(#card)" stroke="#ffa657" stroke-width="1.5"/>
+  <text x="715" y="239" font-family="'Segoe UI', Arial, sans-serif" font-size="11" font-weight="700" fill="#ffa657">05  WP Import / Publish</text>
+  <text x="715" y="255" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681">1-click import or MCP push</text>
+
+  <!-- Arrow markers -->
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#30363d"/>
+    </marker>
+  </defs>
+
+  <!-- Stats row at bottom right -->
+  <rect x="1020" y="220" width="70" height="44" rx="8" fill="#161b22" stroke="#21262d" stroke-width="1"/>
+  <text x="1055" y="241" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="800" fill="#f78166" text-anchor="middle">8</text>
+  <text x="1055" y="256" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681" text-anchor="middle">Pipelines</text>
+
+  <rect x="1100" y="220" width="70" height="44" rx="8" fill="#161b22" stroke="#21262d" stroke-width="1"/>
+  <text x="1135" y="241" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="800" fill="#79c0ff" text-anchor="middle">20+</text>
+  <text x="1135" y="256" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681" text-anchor="middle">Widgets</text>
+
+  <rect x="1180" y="220" width="70" height="44" rx="8" fill="#161b22" stroke="#21262d" stroke-width="1"/>
+  <text x="1215" y="241" font-family="'Segoe UI', Arial, sans-serif" font-size="18" font-weight="800" fill="#56d364" text-anchor="middle">7+</text>
+  <text x="1215" y="256" font-family="'Segoe UI', Arial, sans-serif" font-size="10" fill="#6e7681" text-anchor="middle">Yrs Exp.</text>
+
+  <!-- Bottom border accent -->
+  <rect x="0" y="316" width="1280" height="4" fill="url(#accentLine)"/>
+</svg>
