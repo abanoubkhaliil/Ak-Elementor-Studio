@@ -195,8 +195,7 @@ Free alternative: html widget with inline <style>
 | 🌐 Portfolio | [akstudio.me](https://akstudio.me) |
 | 📍 Location | Cairo, Egypt |
 | 💼 Experience | 7+ years WordPress & Webflow |
-| 🏢 Current Role | InVitro Capital — AllCare.ai, AllRx.ai |
-| 🔧 Freelance | 13 live projects across Egypt & MENA |
+
 
 ---
 
