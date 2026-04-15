@@ -1,622 +1,765 @@
 ---
-name: ak-elementor-studio
+name: elementor-kit-builder
 description: >
-  AK Elementor Studio — built by Abanoub Khalil (akstudio.me). Converts ANY input — HTML/CSS/JS code, screenshots, images (PNG, JPG, WebP), PDFs, Figma exports, design mockups, wireframes, or any visual file — into fully structured Elementor page JSON templates importable into WordPress. Activate this skill whenever the user: uploads a design image or screenshot and wants it built in WordPress, shares HTML/CSS/JS to convert to Elementor, pastes code or attaches a file and mentions Elementor, WordPress, or page builder, says anything like "convert this to Elementor", "build this in WordPress", "turn this design into a page", "make this Elementor template", "recreate this layout in Elementor", "import this into WordPress", or uploads a PDF/image of a webpage, landing page, mockup, or UI design. This skill handles ALL input types: code, images, PDFs, mixed inputs, and even verbal descriptions of layouts.
+  Elementor Pro Template Kit Builder. Converts ANY input — image (PNG/JPG/WebP), PDF, HTML+CSS+JS
+  files, Figma screenshots, or design mockups — into a valid Elementor Pro Template Kit ZIP file
+  ready to import on any WordPress site. Activate this skill whenever the user: uploads a design
+  file and wants a full WordPress kit, says "build an elementor kit", "template kit", "kit zip",
+  "elementor pro kit", "make me a full wordpress template", "generate elementor pages", or asks
+  to convert a design into a multi-page Elementor template. This skill produces Envato-style
+  importable .zip kits using ONLY native Elementor Pro widgets — zero raw HTML widgets for
+  visual content.
 ---
 
-# AK Elementor Studio
-### by [Abanoub Khalil](https://akstudio.me) — Senior WordPress & Webflow Developer
-
-> **AK Elementor Studio** is a professional Claude skill that converts any design input into production-ready WordPress Elementor templates — built and maintained by Abanoub Khalil, Senior WordPress & Webflow Developer with 7+ years of experience at [akstudio.me](https://akstudio.me).
-
-Converts **any input format** into production-ready Elementor template JSON files (`.json`) importable directly into WordPress, plus optional direct publishing via the WordPress MCP.
-
----
-
-## STEP 0 — Input Type Detection (Always Do This First)
-
-Before anything else, identify what the user provided and route to the correct pipeline:
-
-| Input Type | Detection Signals | Pipeline |
-|---|---|---|
-| **HTML/CSS/JS code** | Code blocks, `.html`/`.css`/`.js` files, pasted markup | → [Code Pipeline](#code-pipeline) |
-| **Image file** | `.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.svg` attached | → [Visual Pipeline](#visual-pipeline) |
-| **PDF file** | `.pdf` attached | → [PDF Pipeline](#pdf-pipeline) |
-| **Figma / Design export** | Figma link, `.fig`, design system screenshot | → [Visual Pipeline](#visual-pipeline) |
-| **Screenshot / mockup** | Any image of a webpage, UI, wireframe, or app screen | → [Visual Pipeline](#visual-pipeline) |
-| **Mixed** | Code + image together | → Run both pipelines, merge results |
-| **Description only** | User describes the page in words | → [Description Pipeline](#description-pipeline) |
-| **Elementor JSON (edit)** | Existing `.json` Elementor file | → [Edit Pipeline](#edit-pipeline) |
+# Elementor Pro Template Kit Builder
 
 ---
 
-## Code Pipeline
+## RULE #1 — THE MOST IMPORTANT RULE
 
-For HTML, CSS, JavaScript inputs.
+```
+HTML WIDGET = JAVASCRIPT <script> TAGS ONLY.
 
-### Step 1 — Parse Structure
-- Identify top-level sections (hero, navbar, features, about, CTA, footer, etc.)
-- Each major section → one Elementor **container**
-- Note column layouts (2-col, 3-col, etc.) → inner containers with `width` percentages
+The html widget has exactly one valid use:
+  → Embedding a <script> tag for JS behavior (GSAP, AOS, Swiper init, etc.)
 
-### Step 2 — Extract Styles
-- Pull all `background`, `color`, `font-*`, `padding`, `margin`, `border`, `box-shadow` values
-- Map every CSS property to Elementor settings using `references/style-map.md`
-- CSS Grid / complex layouts → use `html` widget with scoped `<style>`
+That is ALL. Nothing else ever goes in the html widget.
+Not headings. Not text. Not badges. Not cards. Not nav links.
+Not pricing. Not timelines. Not icons. Not ANY visual content.
 
-### Step 3 — Map Elements to Widgets
-Use the widget map table below. Read `references/widget-map.md` for full JSON settings per widget.
-
-### Step 4 — Handle JavaScript
-See [JavaScript Strategy](#javascript-strategy) section.
-
-### Step 5 — Build & Output JSON
-Assemble full document, validate IDs are unique, output `.json` file.
+Every visual element has a native Elementor widget. Use it.
+```
 
 ---
 
-## Visual Pipeline
-
-For PNG, JPG, WebP, GIF, SVG, Figma exports, screenshots, mockups, wireframes.
-
-### Phase 1 — Visual Scan (Read image top-to-bottom)
-
-Scan the design in this order and document findings:
+## RULE #2 — ABSOLUTE JSON RULES
 
 ```
-1. NAVBAR / HEADER
-   - Logo position (left/center/right)
-   - Navigation links (list them)
-   - CTA button text & color
-   - Background color / transparency
-
-2. HERO SECTION
-   - Full-width or boxed?
-   - Background: solid color / image / gradient / video?
-   - Headline text (estimate font size: huge=64px+, large=48px, medium=36px)
-   - Subheadline / tagline text
-   - CTA button(s): text, colors
-   - Hero image position (left/right/center/background)
-   - Min-height: full-screen (100vh) or fixed height?
-
-3. CONTENT SECTIONS (repeat for each)
-   - Section purpose (features, about, stats, services, portfolio, etc.)
-   - Layout: single column / 2-col / 3-col / 4-col / asymmetric?
-   - Column widths (estimate: 50/50, 60/40, 33/33/33, etc.)
-   - Background color / image
-   - Widget types present in each column
-
-4. FOOTER
-   - Columns count
-   - Content: logo, links, social icons, copyright, newsletter
-
-5. GLOBAL STYLES
-   - Primary color (dominant brand color)
-   - Secondary / accent color
-   - Text color (body, headings)
-   - Background color (default sections)
-   - Font style (serif / sans-serif / monospace — approximate)
-   - Rounded vs sharp corners (estimate border-radius)
-   - Card/box shadows visible?
+1. NO COMMENTS — /* */ and // both break JSON parsing
+2. NO TRAILING COMMAS
+3. IDs = UNIQUE 8-CHAR HEX ONLY via secrets.token_hex(4)
+4. EVERY ELEMENT MUST HAVE "elements": []
+5. isInner RULE:
+     Direct children of "content": []    → "isInner": false
+     Containers nested inside containers → "isInner": true
+     Widgets (inside any container)      → "isInner": false
+6. HEX OR rgba() COLORS ONLY — never named colors
+     ❌ "background_color": "transparent"
+     ✅ "background_color": "rgba(0,0,0,0)"
+     ❌ "color": "white"
+     ✅ "color": "#FFFFFF"
+7. PLACEHOLDER IMAGES: https://placehold.co/WxH/BGHEX/TEXTHEX?text=Label
+8. RESPONSIVE: _tablet and _mobile suffixes required on ALL font sizes, paddings, widths
 ```
-
-### Phase 2 — Color Extraction
-
-Extract exact hex colors by visual estimation:
-
-```
-For each color observed:
-- Pure white → #FFFFFF
-- Off-white / light gray → #F8F9FA or #F5F5F5
-- Dark navy → #1A1A2E or #0D1B2A
-- Dark gray text → #333333 or #222222
-- Medium gray → #666666 or #777777
-- Light gray → #BBBBBB or #CCCCCC
-- Pure black → #000000
-- Common brand blues → #007BFF, #0066CC, #2D6FDB
-- Common greens → #28A745, #4CAF50, #2ECC71
-- Common reds → #DC3545, #E53935, #FF4757
-- Common oranges → #FD7E14, #FF6348, #F39C12
-- Gradients: identify start + end colors + angle
-
-ALWAYS provide a hex value — never output "blue" or "dark".
-```
-
-### Phase 3 — Typography Estimation
-
-Estimate font sizes from visual proportion:
-
-```
-Pixel size estimation guide:
-- Massive hero title (dominates the screen)  → 72–96px
-- Large hero title                            → 56–64px
-- Section headline                            → 36–48px
-- Card title / sub-heading                   → 24–30px
-- Body text (comfortable reading size)        → 15–18px
-- Small caption / label                       → 12–14px
-- Navigation links                            → 14–16px
-- Button text                                 → 14–16px
-
-Font weight from visual weight:
-- Hair-thin lines           → "100" or "200"
-- Thin                      → "300"
-- Normal/regular body text  → "400"
-- Medium (slightly bold)    → "500" or "600"
-- Bold headings             → "700"
-- Extra bold / heavy        → "800" or "900"
-
-Font family approximation:
-- Geometric, modern sans    → "Montserrat", "Poppins", or "Nunito"
-- Clean, neutral sans       → "Inter", "Roboto", or "Open Sans"
-- Humanist sans             → "Lato" or "Source Sans Pro"
-- Elegant serif             → "Playfair Display" or "Merriweather"
-- Slab serif                → "Roboto Slab"
-- Monospace/code            → "Roboto Mono" or "Fira Code"
-- Display / decorative      → "Oswald" or "Raleway"
-Always choose from Google Fonts.
-```
-
-### Phase 4 — Layout Grid Mapping
-
-Map visual column layouts to Elementor inner containers:
-
-```
-LAYOUT PATTERNS → ELEMENTOR STRUCTURE:
-
-Full-width single column:
-→ 1 container (flex-direction: column, content_width: full)
-
-Two equal columns (50/50):
-→ parent container (flex-direction: row) +
-  2 inner containers (width: 50% each)
-
-Two unequal columns (60/40 or 40/60):
-→ parent container (flex-direction: row) +
-  inner container A (width: 60%) +
-  inner container B (width: 40%)
-
-Three equal columns (33/33/33):
-→ parent container (flex-direction: row, flex-wrap: wrap) +
-  3 inner containers (width: 33.33% each)
-
-Four equal columns:
-→ parent container (flex-direction: row, flex-wrap: wrap) +
-  4 inner containers (width: 25% each)
-
-Feature cards (3+ cards in a row):
-→ parent container (flex-direction: row, flex-wrap: wrap, flex-justify-content: space-between) +
-  N inner containers (width: 30% or 31%)
-
-Alternating image+text (left image, right text):
-→ parent container (flex-direction: row) +
-  inner container LEFT (width: 50%) + image widget
-  inner container RIGHT (width: 50%) + heading + text + button
-
-Hero with centered text only:
-→ single container (flex-direction: column, flex-align-items: center, min_height: 100vh)
-  + heading + text-editor + button
-
-Hero with text-left, image-right:
-→ parent container (flex-direction: row, min_height: 100vh) +
-  inner LEFT (width: 50%) + heading + text + button +
-  inner RIGHT (width: 50%) + image widget
-```
-
-### Phase 5 — Element-to-Widget Recognition
-
-Match visual elements to Elementor widgets:
-
-| Visual Element Seen | Elementor Widget | `widgetType` |
-|---|---|---|
-| Large headline text | Heading | `heading` |
-| Paragraph / body text | Text Editor | `text-editor` |
-| Photo / illustration | Image | `image` |
-| Click/CTA button | Button | `button` |
-| YouTube/Vimeo frame | Video | `video` |
-| Horizontal line | Divider | `divider` |
-| Empty gap / spacing | Spacer | `spacer` |
-| Icon + title + description card | Icon Box | `icon-box` |
-| List with icon bullets | Icon List | `icon-list` |
-| Photo + title + description | Image Box | `image-box` |
-| Animated counter (500+, 10K, etc.) | Counter | `counter` |
-| Quote with avatar + name | Testimonial | `testimonial` |
-| Expandable FAQ rows | Accordion | `accordion` |
-| Tab navigation UI | Tabs | `tabs` |
-| Social media icon row | Social Icons | `social-icons` |
-| Map embed | Google Maps | `google-maps` |
-| Logo strip / partner logos | Image Carousel | `image-carousel` |
-| Photo gallery grid | Image Gallery | `image-gallery` |
-| Progress/skill bar | Progress Bar | `progress` |
-| Pricing table | HTML widget (custom) | `html` |
-| Complex interactive element | HTML widget | `html` |
-| Star rating row | HTML widget | `html` |
-
-### Phase 6 — Spacing Estimation
-
-Estimate padding/margin values from visual proportions:
-
-```
-Section padding (top/bottom):
-- Very tight sections     → 20–30px
-- Normal sections         → 60–80px
-- Hero / large sections   → 100–120px
-- Extra spacious          → 150–200px
-
-Section padding (left/right):
-- Full-width sections     → 0px (background bleeds)
-- Contained content       → 20–60px sides
-
-Card/widget internal padding:
-- Tight card              → 15–20px
-- Normal card             → 25–30px
-- Spacious card           → 40–60px
-
-Column gap / space between cards:
-- Tight                   → 10–15px
-- Normal                  → 20–30px
-- Spacious                → 40–60px
-```
-
-### Phase 7 — Generate JSON
-
-After completing the visual scan:
-1. Build the full Elementor JSON document section by section
-2. Apply extracted colors, fonts, spacing to every element
-3. Use placeholder image URLs (`https://placehold.co/800x600/EEEEEE/999999?text=Image`) for any images
-4. Add a `<!-- Visual Analysis Note -->` comment section before the JSON explaining what was detected
-5. Output the `.json` file
-6. Optionally, flag elements that need user input (e.g., "Replace placeholder image with your actual photo")
 
 ---
 
-## PDF Pipeline
+## TRIGGER CONDITIONS
 
-For `.pdf` files attached by the user.
+Activate this skill when the user:
 
-### Step 1 — Determine PDF type
-- **Single-page PDF**: treat as a design image → run Visual Pipeline on each rendered page
-- **Multi-page PDF** (wireframe doc, style guide, design spec): analyze page by page
-- **PDF with selectable text**: extract text content first, then analyze layout visually
-
-### Step 2 — Page-by-page analysis
-For each page in the PDF:
-1. Run the Visual Pipeline (Phase 1–6)
-2. Create one Elementor template per logical page/section
-3. If PDF is a style guide: extract colors, fonts, spacing rules and apply globally
-
-### Step 3 — Multi-page output
-- Single-page PDF → one `.json` template file
-- Multi-page PDF → one `.json` per meaningful page, clearly named
-- Always note: "Page X of Y converted" in the summary
-
-### Step 4 — Text extraction priority
-When PDF has selectable/copyable text, always use the **exact text** (don't approximate). Use visual analysis only for layout, colors, and spacing.
+- Uploads PNG/JPG/WebP/PDF and mentions WordPress, Elementor, kit, or template
+- Says: "build an elementor kit", "template kit zip", "kit zip", "elementor pro kit"
+- Says: "make me a full wordpress template", "generate elementor pages for this design"
+- Says: "convert this to a kit", "turn this mockup into a WordPress theme"
+- Asks for a multi-page Elementor output (more than one page template)
+- Mentions "Envato Elements", "Hello Elementor", "Theme Builder"
 
 ---
 
-## Description Pipeline
+## STEP 0 — PRE-FLIGHT INTERVIEW (all in ONE message, never skip)
 
-When the user describes the page in words (no code or image).
+```
+👋 Quick questions before I start building your Elementor Kit:
 
-### Process
-1. Ask one clarifying question if the description is very vague: "What type of page? (landing page / portfolio / service page / blog / other)"
-2. Map described elements to widgets and containers
-3. Use professional defaults for colors (#1A1A2E dark, #FF6B6B accent, #FFFFFF white) unless user specifies
-4. Build the JSON from the description
-5. Note in the output: "Colors and fonts are defaults — customize in Elementor as needed"
+1. KIT NAME & SLUG
+   What should the kit be named? (e.g. "SaaS Pro Kit", slug: "saas-pro-kit")
+
+2. PAGES NEEDED
+   Which pages? (e.g. home, about, services, pricing, contact, blog)
+   Or just type: "standard 5-page"
+
+3. BRAND COLORS
+   Paste your hex codes, OR type "extract from my design" and I'll pull them automatically.
+
+4. FONTS
+   Google Font preference? (e.g. "Inter", "Plus Jakarta Sans", "Syne + Inter")
+   Or type "auto" to use Inter by default.
+
+5. ELEMENTOR VERSION
+   Pro (recommended) or Free?
+   Pro = sticky header, Theme Builder header/footer, Form widget, Loop Grid
+   Free = header/footer baked into each page, shortcode for forms
+
+6. CUSTOM POST TYPES
+   Any CPTs needed? (Blog, Portfolio, Services, Team, Testimonials)
+   These add pro Posts/Loop Grid widgets and ACF field hints.
+
+7. THEME
+   Dark or Light?
+
+8. INDUSTRY / NICHE
+   e.g. SaaS, Agency, Restaurant, Medical, eCommerce, Portfolio, Education
+   (Affects default copy tone and section order)
+```
 
 ---
 
-## Edit Pipeline
+## STEP 1 — INPUT DETECTION
 
-When the user uploads an existing Elementor `.json` file to modify.
-
-### Process
-1. Parse the incoming JSON
-2. Locate the target element by its `id`, `widgetType`, or text content
-3. Apply the requested changes to settings
-4. Re-output the complete valid JSON
-5. Summarize what changed: "Updated heading text in id `3a4f1b2c`, changed button color in id `9d7e6f10`"
+| Input Type | Pipeline Used |
+|---|---|
+| PNG / JPG / WebP / screenshot / Figma export | Visual Pipeline |
+| PDF (single or multi-page) | PDF Pipeline → Visual Pipeline per page |
+| HTML + CSS + JS files | Code Pipeline |
+| Text description only | Description Pipeline |
+| Existing Elementor JSON | Edit Pipeline |
+| Mixed inputs | All relevant pipelines, merged |
 
 ---
 
-## JSON Document Structure
+## STEP 2 — ANALYSIS PHASE
 
-Every Elementor template file:
+### Visual Pipeline (images + PDFs)
+1. Extract dominant colors via PIL quantization (top 6 hex values)
+2. Detect dark/light theme from luminance of primary color
+3. Detect section boundaries by horizontal brightness bands
+4. Identify section types: navbar, hero, features, stats, testimonials, pricing, cta, footer
+5. Extract fonts from any visible text (estimate if needed)
+6. Note animation libraries if script tags are visible (GSAP, AOS, Swiper)
 
+### Code Pipeline (HTML/CSS/JS)
+1. Parse all `#RRGGBB` hex values from CSS → brand colors
+2. Extract `font-family` declarations → font list
+3. Map structural HTML tags (`<header>`, `<section>`, `<footer>`) to section types
+4. Detect inline background colors from style attributes
+5. Find animation library script srcs → note for html widget injection
+
+### Output — DesignSpec object:
+```
+pages:            list of page names
+brand_colors:     [primary_bg, accent, light_bg, card_bg, dark_bg, highlight]
+fonts:            [heading_font, body_font]
+sections:         ordered list of detected sections with types and bg colors
+is_dark_theme:    boolean
+has_animations:   boolean
+animation_scripts: list of script src URLs
+```
+
+---
+
+## STEP 3 — WIDGET ASSIGNMENT REFERENCE
+
+### Free Widgets
+| Element | Widget |
+|---|---|
+| h1 / h2 / h3 / h4 / h5 / h6 | `heading` |
+| Paragraph / body text | `text-editor` |
+| Button / CTA | `button` |
+| Photo / image | `image` |
+| Icon + title + description | `icon-box` |
+| Bulleted/icon list | `icon-list` |
+| Photo + title + text card | `image-box` |
+| Customer quote | `testimonial` |
+| Animated number counter | `counter` |
+| Progress / skill bar | `progress` |
+| Horizontal line | `divider` |
+| Vertical blank space | `spacer` |
+| FAQ / collapsible | `accordion` |
+| Tab navigation | `tabs` |
+| Social media icons | `social-icons` |
+| YouTube / Vimeo | `video` |
+| Image slider | `image-carousel` |
+| Image grid | `image-gallery` |
+| Map embed | `google-maps` |
+| Plugin shortcode | `shortcode` |
+| Info / status banner | `alert` |
+
+### Pro Widgets
+| Element | Widget |
+|---|---|
+| Blog / post grid | `posts` |
+| Portfolio grid | `portfolio` |
+| Full-screen slider | `slides` |
+| Price list | `price-list` |
+| Pricing card | `price-table` |
+| Flip card | `flip-box` |
+| CTA with bg image | `call-to-action` |
+| Countdown timer | `countdown` |
+| Share buttons | `share-buttons` |
+| Navigation menu | `nav-menu` |
+| Site logo | `site-logo` |
+| Site title | `site-title` |
+| Page title (Theme Builder) | `page-title` |
+| Post content (Theme Builder) | `post-content` |
+| Contact / lead form | `form` |
+
+### ⚠️ html widget — ONLY for `<script>` tags
 ```json
 {
-  "title": "Page Title",
-  "type": "page",
-  "version": "0.4",
-  "page_settings": {
-    "margin": { "unit": "px", "top": "0", "right": "0", "bottom": "0", "left": "0", "isLinked": true },
-    "padding": { "unit": "px", "top": "0", "right": "0", "bottom": "0", "left": "0", "isLinked": true }
-  },
-  "content": []
+  "widgetType": "html",
+  "settings": {
+    "html": "<script src=\"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js\"></script>"
+  }
 }
 ```
 
-**`type` values:** `page` | `section` | `header` | `footer` | `single` | `archive`
+---
+
+## STEP 4 — COMPLEX ELEMENT PATTERNS
+
+### Navigation Bar (Pro)
+```
+flex container (row, space-between, sticky)
+  └── site-logo widget
+  └── icon-list widget (layout: inline, icons: none) ← nav links
+  └── button widget ← CTA
+```
+
+### Navigation Bar (Free)
+```
+flex container (row, space-between)
+  └── image widget ← logo PNG/SVG
+  └── icon-list widget (layout: inline) ← nav links
+  └── button widget ← CTA
+```
+
+### Badge / Status Pill / Tag
+```
+button widget (size: xs, border_radius: 100px)
+  button_background_color: rgba(0,90,255,0.12)
+  button_text_color: #005AFF
+  link: { url: "#" }
+```
+OR:
+```
+alert widget (type: info/success/warning, show_dismiss_button: no)
+```
+
+### Pricing Card
+```
+inner container (column, bg: card color, border-radius: 12px, padding: 40px 32px)
+  └── text-editor widget    ← plan label (uppercase, small)
+  └── heading widget (h2)   ← "$49" price
+  └── text-editor widget    ← "/month" period (muted)
+  └── divider widget
+  └── icon-list widget      ← features (fas fa-check icons)
+  └── button widget         ← CTA (full-width)
+```
+Featured plan: add `border_border: solid, border_color: accent, border_width: 2px`
+
+### Testimonial Card
+```
+inner container (column, bg: card color, border-radius: 12px, padding: 28px 24px)
+  └── testimonial widget
+      image: avatar URL
+      name: "Client Name"
+      testimonial_job: "Title, Company"
+      testimonial_content: "Quote here."
+```
+
+### Footer (4-column)
+```
+section-wrapper (bg: dark)
+  └── row container (4 cols, flex-wrap)
+      └── col 1 (25%): image (logo) + text-editor (tagline) + social-icons
+      └── col 2 (20%): heading (h5) + icon-list (nav links)
+      └── col 3 (20%): heading (h5) + icon-list (nav links)
+      └── col 4 (25%): heading (h5) + text-editor (contact) + button (CTA)
+  └── divider widget
+  └── row container: text-editor (copyright) + text-editor (links)
+```
+
+### Stats Row
+```
+row container (4 cols, flex-wrap, space-around)
+  └── counter widget × 4 (number, suffix, title, color)
+```
+
+### Hero (2-col with image)
+```
+section-wrapper (bg: dark, min-height: 90vh, flex-direction: row → column on tablet/mobile)
+  └── inner col (55%):
+      └── alert (badge)
+      └── heading (h1, large)
+      └── text-editor (subheadline)
+      └── row container: button (primary CTA) + button (ghost secondary)
+  └── inner col (45%):
+      └── image widget (border-radius: 12px)
+```
 
 ---
 
-## Element Hierarchy
-
-**Modern (Elementor 3.6+) — ALWAYS USE THIS:**
-```
-Container (isInner: false)
-  └── Container (isInner: true)  ← for columns
-        └── Widget
-```
-
-**Legacy (avoid unless user requires it):**
-```
-Section → Column → Widget
-```
-
----
-
-## ID Generation Rule
-
-Every element: **unique 8-character hex ID**, never reused.
-```
-Good: "3a4f1b2c", "9d7e6f10", "a1b2c3d4", "f8e1d2c3"
-Bad:  "id1", "widget1", reusing any existing ID
-```
-
----
-
-## Widget Quick Reference
-
-Full JSON examples in `references/widget-map.md`.
-
-| Visual / HTML Input | `widgetType` |
-|---|---|
-| `<h1>`–`<h6>` / large headline | `heading` |
-| `<p>` / body text / rich text | `text-editor` |
-| `<img>` / photo | `image` |
-| CTA / `<button>` / `<a class=btn>` | `button` |
-| YouTube/Vimeo / `<video>` | `video` |
-| `<hr>` / separator line | `divider` |
-| Gap / whitespace | `spacer` |
-| Icon + title + desc card | `icon-box` |
-| Bulleted icon list | `icon-list` |
-| Photo + title + desc | `image-box` |
-| Animated number stat | `counter` |
-| Quote / review | `testimonial` |
-| FAQ / collapsible | `accordion` |
-| Tab nav UI | `tabs` |
-| Social media row | `social-icons` |
-| Map / location | `google-maps` |
-| Plugin shortcode | `shortcode` |
-| Alert / notice bar | `alert` |
-| Photo grid | `image-gallery` |
-| Slider / carousel | `image-carousel` |
-| Skill/progress bar | `progress` |
-| Custom/complex HTML | `html` |
-
----
-
-## CSS → Elementor Quick Reference
-
-Full mapping in `references/style-map.md`.
+## STEP 5 — CSS → ELEMENTOR QUICK REFERENCE
 
 ```json
-// Spacing
-"padding": { "unit": "px", "top": "80", "right": "40", "bottom": "80", "left": "40", "isLinked": false }
-"_padding": { ... }   // widget-level (prefix with _)
-"_margin":  { ... }   // widget-level
+padding/margin:
+  "padding": { "unit": "px", "top": "80", "right": "60", "bottom": "80", "left": "60", "isLinked": false }
+  "padding_tablet": { "unit": "px", "top": "50", "right": "30", "bottom": "50", "left": "30", "isLinked": false }
+  "padding_mobile": { "unit": "px", "top": "40", "right": "20", "bottom": "40", "left": "20", "isLinked": false }
 
-// Typography
-"typography_typography": "custom",
-"typography_font_family": "Poppins",
-"typography_font_size": { "unit": "px", "size": 48 },
-"typography_font_size_tablet": { "unit": "px", "size": 32 },
-"typography_font_size_mobile": { "unit": "px", "size": 24 },
-"typography_font_weight": "700",
-"typography_line_height": { "unit": "em", "size": 1.4 },
-"typography_letter_spacing": { "unit": "px", "size": -0.5 }
+typography:
+  "typography_typography": "custom"
+  "typography_font_family": "Inter"
+  "typography_font_weight": "700"
+  "typography_font_size": { "unit": "px", "size": 48 }
+  "typography_font_size_tablet": { "unit": "px", "size": 36 }
+  "typography_font_size_mobile": { "unit": "px", "size": 28 }
+  "typography_line_height": { "unit": "em", "size": 1.3 }
+  "typography_letter_spacing": { "unit": "px", "size": -1 }
+  "typography_text_transform": "uppercase"
 
-// Background — solid
-"background_background": "classic",
-"background_color": "#1A1A2E"
+background gradient:
+  "background_background": "gradient"
+  "background_color": "#005AFF"
+  "background_color_b": "#1A1A2E"
+  "background_gradient_type": "linear"
+  "background_gradient_angle": { "unit": "deg", "size": 135 }
 
-// Background — image
-"background_background": "classic",
-"background_image": { "url": "https://example.com/img.jpg", "id": "" },
-"background_size": "cover",
-"background_position": "center center",
-"background_repeat": "no-repeat"
+border + radius:
+  "border_border": "solid"
+  "border_width": { "unit": "px", "top": "1", "right": "1", "bottom": "1", "left": "1", "isLinked": true }
+  "border_color": "#E5E7EB"
+  "border_radius": { "unit": "px", "top": "12", "right": "12", "bottom": "12", "left": "12", "isLinked": true }
 
-// Background — gradient
-"background_background": "gradient",
-"background_gradient_type": "linear",
-"background_color": "#FF6B6B",
-"background_color_b": "#4ECDC4",
-"background_gradient_angle": { "unit": "deg", "size": 135 }
+box shadow:
+  "box_shadow_box_shadow_type": "yes"
+  "box_shadow_box_shadow": { "horizontal": 0, "vertical": 4, "blur": 24, "spread": 0, "color": "rgba(0,0,0,0.08)" }
 
-// Border
-"border_border": "solid",
-"border_width": { "unit": "px", "top": "1", "right": "1", "bottom": "1", "left": "1", "isLinked": true },
-"border_color": "#DDDDDD",
-"border_radius": { "unit": "px", "top": "8", "right": "8", "bottom": "8", "left": "8", "isLinked": true }
+responsive width:
+  "width": { "unit": "%", "size": 33 }
+  "width_tablet": { "unit": "%", "size": 50 }
+  "width_mobile": { "unit": "%", "size": 100 }
 
-// Box shadow
-"box_shadow_box_shadow_type": "yes",
-"box_shadow_box_shadow": { "horizontal": 0, "vertical": 4, "blur": 20, "spread": 0, "color": "rgba(0,0,0,0.1)" }
+flex gap:
+  "flex_gap": { "unit": "px", "column": "24", "row": "24", "isLinked": true }
+
+flex wrap:
+  "flex_wrap": "wrap"
+
+sticky (Pro):
+  "sticky": "top"
+  "sticky_offset": 0
 ```
 
 ---
 
-## JavaScript Strategy
+## STEP 6 — JSON SCHEMA REFERENCE
 
-| JS Feature | Elementor Solution |
-|---|---|
-| CSS transitions / animations | Elementor Entrance Animations (Advanced tab → Motion Effects) |
-| Scroll-triggered effects | Elementor Scrolling Effects (Pro) |
-| Popup / modal | Elementor Pro Popup Builder (note requirement) |
-| Slider / carousel | `image-carousel` widget |
-| Counter animation | `counter` widget |
-| Typed text effect | `html` widget with typed.js CDN |
-| Custom JS | `html` widget with `<script>` tag |
-| jQuery plugins | `html` widget or `shortcode` widget |
-| Parallax | Container → Motion Effects → Parallax (Pro) |
-| Sticky nav | `custom_css` + `position: sticky` |
-
+### Page JSON wrapper
 ```json
-// JS embedded in html widget
 {
-  "id": "js1a2b3c",
-  "elType": "widget",
-  "widgetType": "html",
-  "settings": {
-    "html": "<div id='typed-target'></div>\n<script src='https://cdn.jsdelivr.net/npm/typed.js@2.0.12'></script>\n<script>new Typed('#typed-target', { strings: ['Developer', 'Designer'], typeSpeed: 60 });</script>"
+  "title": "Home",
+  "type": "page",
+  "version": "0.4",
+  "page_settings": {
+    "hide_title": true,
+    "page_layout": "elementor_canvas"
   },
+  "content": [],
+  "settings": {}
+}
+```
+
+### Section container (top-level)
+```json
+{
+  "id": "a1b2c3d4",
+  "elType": "container",
+  "isInner": false,
+  "settings": {
+    "content_width": "full",
+    "flex_direction": "column",
+    "flex_align_items": "center",
+    "flex_justify_content": "flex-start",
+    "flex_gap": { "unit": "px", "column": "30", "row": "30", "isLinked": true },
+    "padding": { "unit": "px", "top": "80", "right": "60", "bottom": "80", "left": "60", "isLinked": false },
+    "padding_tablet": { "unit": "px", "top": "50", "right": "30", "bottom": "50", "left": "30", "isLinked": false },
+    "padding_mobile": { "unit": "px", "top": "40", "right": "20", "bottom": "40", "left": "20", "isLinked": false },
+    "background_background": "classic",
+    "background_color": "#FFFFFF"
+  },
+  "elements": []
+}
+```
+
+### Inner container (nested)
+```json
+{
+  "id": "b2c3d4e5",
+  "elType": "container",
+  "isInner": true,
+  "settings": {
+    "width": { "unit": "%", "size": 50 },
+    "width_tablet": { "unit": "%", "size": 100 },
+    "width_mobile": { "unit": "%", "size": 100 },
+    "flex_direction": "column",
+    "flex_align_items": "flex-start",
+    "padding": { "unit": "px", "top": "20", "right": "20", "bottom": "20", "left": "20", "isLinked": true }
+  },
+  "elements": []
+}
+```
+
+### Widget
+```json
+{
+  "id": "c3d4e5f6",
+  "elType": "widget",
+  "widgetType": "heading",
+  "isInner": false,
+  "settings": {},
   "elements": []
 }
 ```
 
 ---
 
-## Responsive Settings
+## STEP 7 — KIT ZIP STRUCTURE
 
-Append `_tablet` or `_mobile` to any setting key:
+```
+kit-slug.zip
+├── kit.json                        ← Kit metadata + template list
+└── templates/
+    ├── global-styles.json          ← Global Kit Styles (IMPORT THIS FIRST)
+    ├── header.json                 ← Pro only (type: "header")
+    ├── footer.json                 ← Pro only (type: "footer")
+    ├── home.json
+    ├── about.json
+    ├── services.json
+    ├── pricing.json
+    └── contact.json
+```
 
+### kit.json schema
 ```json
-"typography_font_size": { "unit": "px", "size": 48 },
-"typography_font_size_tablet": { "unit": "px", "size": 36 },
-"typography_font_size_mobile": { "unit": "px", "size": 24 },
-"padding": { "unit": "px", "top": "80", "right": "60", "bottom": "80", "left": "60", "isLinked": false },
-"padding_tablet": { "unit": "px", "top": "50", "right": "30", "bottom": "50", "left": "30", "isLinked": false },
-"padding_mobile": { "unit": "px", "top": "40", "right": "20", "bottom": "40", "left": "20", "isLinked": false },
-"width": { "unit": "%", "size": 33 },
-"width_tablet": { "unit": "%", "size": 50 },
-"width_mobile": { "unit": "%", "size": 100 }
+{
+  "name": "Kit Name",
+  "slug": "kit-slug",
+  "version": "1.0.0",
+  "author": "Your Name",
+  "authorURL": "https://yoursite.com",
+  "templates": [
+    { "name": "Global Styles", "file": "templates/global-styles.json", "type": "kit-styles",  "thumbnail": "" },
+    { "name": "Header",        "file": "templates/header.json",         "type": "header",      "thumbnail": "" },
+    { "name": "Footer",        "file": "templates/footer.json",         "type": "footer",      "thumbnail": "" },
+    { "name": "Home",          "file": "templates/home.json",           "type": "page",        "thumbnail": "" },
+    { "name": "About",         "file": "templates/about.json",          "type": "page",        "thumbnail": "" }
+  ],
+  "requiredPlugins": [
+    { "name": "Elementor",     "slug": "elementor",     "source": "wordpress" },
+    { "name": "Elementor Pro", "slug": "elementor-pro", "source": "wordpress" }
+  ]
+}
+```
+
+### global-styles.json schema
+```json
+{
+  "title": "Global Kit Styles",
+  "type": "kit-styles",
+  "version": "0.4",
+  "page_settings": {},
+  "content": [],
+  "settings": {
+    "system_colors": [
+      { "_id": "primary",   "title": "Primary",   "color": "#005AFF" },
+      { "_id": "secondary", "title": "Secondary",  "color": "#1A1A2E" },
+      { "_id": "text",      "title": "Text",       "color": "#111827" },
+      { "_id": "accent",    "title": "Accent",     "color": "#00C87A" }
+    ],
+    "custom_colors": [
+      { "_id": "c_bg",    "title": "Background", "color": "#FFFFFF" },
+      { "_id": "c_card",  "title": "Card",        "color": "#F9FAFB" },
+      { "_id": "c_muted", "title": "Muted",       "color": "#6B7280" },
+      { "_id": "c_border","title": "Border",      "color": "#E5E7EB" }
+    ],
+    "system_typography": [
+      { "_id": "primary",   "title": "Primary",   "typography_typography": "custom",
+        "typography_font_family": "Inter", "typography_font_weight": "700",
+        "typography_font_size": {"unit":"px","size":48},
+        "typography_font_size_tablet": {"unit":"px","size":36},
+        "typography_font_size_mobile": {"unit":"px","size":28},
+        "typography_line_height": {"unit":"em","size":1.15},
+        "typography_letter_spacing": {"unit":"px","size":-1} },
+      { "_id": "secondary", "title": "Secondary", "typography_typography": "custom",
+        "typography_font_family": "Inter", "typography_font_weight": "600",
+        "typography_font_size": {"unit":"px","size":24},
+        "typography_font_size_tablet": {"unit":"px","size":20},
+        "typography_font_size_mobile": {"unit":"px","size":18},
+        "typography_line_height": {"unit":"em","size":1.3} },
+      { "_id": "text",      "title": "Text",      "typography_typography": "custom",
+        "typography_font_family": "Inter", "typography_font_weight": "400",
+        "typography_font_size": {"unit":"px","size":16},
+        "typography_font_size_mobile": {"unit":"px","size":15},
+        "typography_line_height": {"unit":"em","size":1.75} },
+      { "_id": "accent",    "title": "Accent",    "typography_typography": "custom",
+        "typography_font_family": "Inter", "typography_font_weight": "500",
+        "typography_font_size": {"unit":"px","size":13},
+        "typography_letter_spacing": {"unit":"px","size":1},
+        "typography_text_transform": "uppercase" }
+    ],
+    "custom_typography": [],
+    "default_generic_fonts": "Inter, sans-serif"
+  }
+}
 ```
 
 ---
 
-## Custom CSS
+## STEP 8 — PRO vs FREE MATRIX
 
-```json
-"custom_css": "selector { clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%); }\nselector:hover { transform: translateY(-5px); }"
 ```
-`selector` = Elementor's placeholder. Requires Elementor Pro. For free Elementor, use `html` widget with `<style>`.
+⚠️ PRO ONLY:
+  type: "header" / "footer" in kit        → Requires Elementor Pro Theme Builder
+  nav-menu widget                          → Requires Elementor Pro
+  site-logo widget                         → Requires Elementor Pro
+  site-title widget                        → Requires Elementor Pro
+  page-title widget                        → Requires Elementor Pro
+  post-content widget                      → Requires Elementor Pro
+  form widget                              → Requires Elementor Pro
+  posts widget                             → Requires Elementor Pro
+  portfolio widget                         → Requires Elementor Pro
+  slides widget                            → Requires Elementor Pro
+  price-list widget                        → Requires Elementor Pro
+  price-table widget                       → Requires Elementor Pro
+  flip-box widget                          → Requires Elementor Pro
+  call-to-action widget                    → Requires Elementor Pro
+  countdown widget                         → Requires Elementor Pro
+  share-buttons widget                     → Requires Elementor Pro
+  sticky (on containers)                   → Requires Elementor Pro
+  custom_css per element                   → Requires Elementor Pro
+  Motion Effects / Scroll Effects          → Requires Elementor Pro
+
+✅ FREE ALTERNATIVES:
+  header/footer     → Section containers baked into each page file (type: "page")
+  nav-menu          → icon-list widget (layout: inline, icon: none per item)
+  site-logo         → image widget (link to homepage)
+  site-title        → heading widget + link
+  forms             → shortcode widget + WPForms/ContactForm7 free plugin
+  posts grid        → shortcode widget + custom query plugin
+  price-table       → inner container + heading + icon-list + button
+  countdown         → shortcode widget + plugin
+  slides            → image-carousel widget (limited but free)
+  animations        → Entrance Animations (Advanced tab, free)
+```
 
 ---
 
-## Direct WordPress Publishing (WordPress MCP)
+## STEP 9 — OUTPUT CHECKLIST
 
-If the WordPress MCP connector is available, offer to publish directly:
+Run through before delivering:
 
-### Check if WordPress MCP is connected:
-- Look for WordPress MCP in available tools
-- If connected: ask user "Should I also publish this directly to your WordPress site?"
+- [ ] ZERO html widgets for visual content — html = `<script>` only
+- [ ] Nav links → `icon-list` or `button` widgets
+- [ ] Badges/tags → `alert` or `button` (xs, pill, rgba bg)
+- [ ] No named colors anywhere (`white`, `black`, `transparent`, etc.) → use hex/rgba
+- [ ] No JSON comments (`/* */` or `//`)
+- [ ] Every element has unique 8-char hex `id`
+- [ ] Every element has `"elements": []`
+- [ ] Top-level content children: `"isInner": false`
+- [ ] All nested containers: `"isInner": true`
+- [ ] All widgets: `"isInner": false`
+- [ ] Responsive `_tablet` + `_mobile` on font sizes, padding, widths
+- [ ] Placeholder images use `https://placehold.co/WxH/BGHEX/TEXTHEX?text=Label`
+- [ ] global-styles.json with real brand colors and fonts
+- [ ] header.json + footer.json present (Pro only)
+- [ ] kit.json present and valid
+- [ ] ⚠️ Pro-only features flagged in delivery message
 
-### Publish flow via WordPress MCP:
-1. Create a new page/post via the MCP
-2. Set `_elementor_edit_mode` = `builder`
-3. Set `_elementor_data` = the JSON content (stringified)
-4. Set page status to `draft` (never publish without user confirmation)
-5. Report back: "Draft page created at [URL]. Open in WordPress to review."
+---
 
-### WP-CLI alternative:
+## STEP 10 — USING THE PYTHON BUILDER
+
+The Python builder at `/home/claude/elementor-kit-builder/` handles all input parsing
+and JSON assembly automatically. Claude should use it when running in a computer-use
+context. In chat-only contexts, Claude generates JSON directly using the schemas above.
+
+### Install dependencies
 ```bash
-wp post create --post_type=page --post_status=draft --post_title="Page Title"
-wp post meta update <post_id> _elementor_data '<json_here>'
-wp post meta update <post_id> _elementor_edit_mode builder
-wp post meta update <post_id> _wp_page_template elementor_canvas
+pip install Pillow PyMuPDF beautifulsoup4 lxml --break-system-packages
+```
+
+### CLI usage
+
+**From an image (PNG/JPG/WebP):**
+```bash
+python main.py \
+  --input design.png \
+  --kit-name "SaaS Landing" \
+  --kit-slug "saas-landing" \
+  --pages home,about,pricing,contact \
+  --output ./output/
+```
+
+**From a PDF mockup:**
+```bash
+python main.py \
+  --input mockup.pdf \
+  --kit-name "Agency Kit" \
+  --kit-slug "agency-kit" \
+  --pages home,services,portfolio,contact \
+  --output ./output/
+```
+
+**From HTML + CSS + JS:**
+```bash
+python main.py \
+  --input index.html \
+  --css style.css \
+  --js main.js \
+  --kit-name "Corporate Kit" \
+  --kit-slug "corporate-kit" \
+  --pages home,about,services,contact \
+  --output ./output/
+```
+
+**From a text description:**
+```bash
+python main.py \
+  --description "Dark SaaS landing page with hero, features grid, testimonials, and pricing" \
+  --kit-name "Dark SaaS Kit" \
+  --kit-slug "dark-saas-kit" \
+  --pages home,pricing,contact \
+  --industry saas \
+  --output ./output/
+```
+
+**Force light theme:**
+```bash
+python main.py --input design.png --kit-name "My Kit" --light --output ./output/
+```
+
+**Elementor Free (no Pro widgets):**
+```bash
+python main.py --input design.png --kit-name "My Kit" --free --output ./output/
+```
+
+### Builder modules
+```
+builder/
+  __init__.py        ← Package exports
+  analyzer.py        ← Input analysis (image/PDF/HTML/description → DesignSpec)
+  widget_factory.py  ← All widget JSON factory functions
+  json_builder.py    ← Section + page assemblers, validation
+  kit_assembler.py   ← ZIP builder
+```
+
+### Run tests
+```bash
+python tests/test_kit_builder.py
+# Expected: 11 passed, 0 failed
 ```
 
 ---
 
-## Output Checklist
+## STEP 11 — SECTION PATTERNS REFERENCE
 
-Before delivering the final JSON, verify:
+Pre-built JSON patterns are in `templates/section_patterns/`:
 
-- [ ] Every element has a **unique 8-char hex `id`**
-- [ ] Every element has `"elements": []` (never omit this)
-- [ ] `isInner: true` set on all nested/child containers
-- [ ] All text content populated (no "Lorem ipsum" unless user asked)
-- [ ] Colors are hex values (no color names like "blue")
-- [ ] Placeholder images use `https://placehold.co/` URLs
-- [ ] Responsive `_tablet` / `_mobile` settings on font sizes and padding
-- [ ] JSON is valid (no trailing commas, balanced braces)
-- [ ] File saved as `[page-name]-elementor.json`
-- [ ] Import instructions included in reply
-
----
-
-## Import Instructions (Always Include)
-
-> **Method 1 — Template Library:**
-> 1. WordPress Dashboard → **Elementor → Templates → Saved Templates**
-> 2. Click the **Import** icon (cloud/upload button)
-> 3. Select the `.json` file → Import
-> 4. Click **Insert** to add to any page
->
-> **Method 2 — Page Editor:**
-> 1. Edit any page with Elementor
-> 2. Click the **folder icon** (bottom center panel)
-> 3. Go to **My Templates** → Import → select `.json`
->
-> **Method 3 — WP-CLI (advanced):**
-> ```bash
-> wp post create --post_type=elementor_library --post_status=publish --post_title="My Template"
-> wp post meta update <id> _elementor_data "$(cat template.json)"
-> wp post meta update <id> _elementor_edit_mode builder
-> ```
+| File | Section | Key Widgets |
+|---|---|---|
+| `hero.json` | Full-screen hero, 2-col | alert (badge), heading (h1), text-editor, 2× button, image |
+| `navbar.json` | Sticky top nav (Pro) | site-logo, icon-list, button |
+| `features_grid.json` | 3-col feature cards | heading, 3× icon-box in bordered containers |
+| `cta_banner.json` | Full-width gradient CTA | heading, text-editor, 2× button |
+| `pricing_table.json` | 3-tier pricing | 3× [heading + icon-list + button] containers |
+| `testimonials.json` | 3-col social proof | 3× testimonial in card containers |
+| `footer.json` | 4-col footer + bottom bar | image, text-editor, social-icons, 2× icon-list, button, divider |
 
 ---
 
-## Common Pitfalls — Never Do These
+## STEP 12 — DEFAULT SECTION ORDER BY PAGE
 
-| ❌ Wrong | ✅ Correct |
+| Page | Sections (in order) |
 |---|---|
-| Omit `"elements": []` on any element | Always include `"elements": []` |
-| Reuse element IDs | Each ID must be unique 8-char hex |
-| Use color names (`"red"`, `"blue"`) | Always use hex (`"#FF0000"`) |
-| Forget `isInner: true` on child containers | Set `isInner: true` for nested containers |
-| Use CSS Grid in container settings | CSS Grid → `html` widget with `<style>` |
-| Put absolute font size only (no responsive) | Always add `_tablet` and `_mobile` variants |
-| Embed private/local image paths | Use absolute URLs or `https://placehold.co/` |
-| Use Elementor Pro features without noting it | Flag Pro features: ⚠️ Requires Elementor Pro |
+| home | navbar → hero → features → stats → testimonials → pricing → cta → footer |
+| about | navbar → hero → features → stats → footer |
+| services | navbar → hero → features → footer |
+| pricing | navbar → hero → pricing → cta → footer |
+| contact | navbar → hero → footer |
+| blog | navbar → hero → posts (Pro) → footer |
+| portfolio | navbar → hero → portfolio (Pro) → footer |
 
 ---
 
-## Elementor Free vs Pro Feature Flags
+## STEP 13 — IMPORT INSTRUCTIONS (always include in delivery)
 
-When generating JSON with Pro features, add this comment in your response (not in JSON):
+### Method A — Envato Kit ZIP (Pro, recommended)
 
+**Prerequisites:**
+- Hello Elementor theme active
+- Elementor Pro installed and active
+- Elementor → Settings → Features → Flexbox Container → **Active**
+- WordPress → Settings → Permalinks → Post Name → Save Changes
+
+**Steps:**
+1. WordPress → Tools → Template Kit → **Upload Template Kit ZIP File**
+2. Upload the `.zip` file
+3. Click **"Import Global Kit Styles" FIRST** (sets brand colors + fonts site-wide)
+4. Then click **"Import Template"** on each page in order (Header first, Footer second, then pages)
+5. To apply a template: Pages → Add New → Edit with Elementor → folder icon → **View Installed Kit** → Insert Template
+
+### Method B — Individual JSON files (Free + Pro)
+
+1. WordPress → Elementor → Templates → **Saved Templates**
+2. Click the import icon (top right)
+3. Select a `.json` file from inside the ZIP → **Import Now**
+4. Repeat for each template
+5. To use: open a page in Elementor → folder icon → **My Templates** → Insert
+
+---
+
+## POST-IMPORT CHECKLIST (include in every delivery)
+
+After importing, the user should:
+
+- [ ] Replace all `placehold.co` images with real images
+- [ ] Update nav links to point to actual page URLs
+- [ ] Set the correct menu in Appearance → Menus (for nav-menu widget, Pro)
+- [ ] Update email address in the form widget or shortcode
+- [ ] Replace `© 2025 YourBrand` in the footer
+- [ ] Set the site logo in Elementor → Site Settings → Site Identity
+- [ ] Activate Google Fonts if using non-system fonts
+- [ ] Test on mobile — check tablet + mobile breakpoints
+- [ ] If using header/footer templates: assign them in Elementor Pro → Theme Builder
+
+---
+
+## ANALYSIS SUMMARY FORMAT
+
+Always show this before outputting JSON or delivering a kit:
+
+```markdown
+## 🔍 Design Analysis — [Kit Name]
+
+**Source:** [image / PDF / HTML / description]
+**Style:** [Dark / Light] · [Minimal / Bold / Corporate / Playful]
+
+| Token       | Value        |
+|-------------|--------------|
+| Primary BG  | #______      |
+| Accent      | #______      |
+| Heading txt | #______      |
+| Body text   | #______      |
+| Card BG     | #______      |
+| Border      | #______      |
+| Heading font| Inter 700    |
+| Body font   | Inter 400    |
+
+**Pages:** home, about, services, pricing, contact
+
+**Widget map:**
+1. Navbar   → site-logo + icon-list (nav links) + button (CTA)
+2. Hero     → alert (badge) + heading (h1) + text-editor + 2× button + image
+3. Features → heading + 3× icon-box in card containers
+4. Stats    → 4× counter widgets
+5. Pricing  → heading + 3× price-table containers
+6. CTA      → heading + text-editor + 2× button (gradient bg)
+7. Footer   → image + text-editor + social-icons + 2× icon-list + text-editor
+
+**html widgets used:** None.  (or list only <script> injections)
+
+**⚠️ Pro features used:** sticky nav, site-logo, form widget, header/footer templates
+**⚠️ After import:** replace placeholder images, update nav links, set real logo
 ```
-⚠️ Pro Features Used:
-- Custom CSS (custom_css setting) → Requires Elementor Pro
-- Popup Builder → Requires Elementor Pro
-- Scrolling Effects → Requires Elementor Pro
-- Theme Builder (header/footer type) → Requires Elementor Pro
-- Form Widget → Requires Elementor Pro
-Free alternative: Use the html widget with inline <style> instead of custom_css.
-```
-
----
-
-## Reference Files
-
-- `references/widget-map.md` — Full JSON settings for every Elementor widget (with visual triggers)
-- `references/style-map.md` — CSS property → Elementor JSON settings lookup table
-- `references/visual-analysis.md` — Deep guide for analyzing images/PDFs/screenshots into Elementor
-- `references/section-patterns.md` — Pre-built JSON patterns for common page sections
-
----
-
-## About This Skill
-
-**AK Elementor Studio** is crafted by **Abanoub Khalil**, Senior WordPress & Webflow Developer based in Cairo, Egypt.
-
-- 🌐 Portfolio: [akstudio.me](https://akstudio.me)
-- 💼 7+ years building WordPress & Webflow sites
-- 🏢 Currently at InVitro Capital — managing AllCare.ai, AllRx.ai & more
-- 🔧 13 live freelance projects across Egypt and the MENA region
-
-*Built with expertise in Elementor, WordPress architecture, SEO optimization, and modern web development workflows.*
