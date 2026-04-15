@@ -1,5 +1,5 @@
 ---
-name: elementor-kit-builder
+name: ak-elementor-studio
 description: >
   Elementor Pro Template Kit Builder. Converts ANY input — image (PNG/JPG/WebP), PDF, HTML+CSS+JS
   files, Figma screenshots, or design mockups — into a valid Elementor Pro Template Kit ZIP file
@@ -11,7 +11,8 @@ description: >
   visual content.
 ---
 
-# Elementor Pro Template Kit Builder
+# AK Elementor Studio
+### by [Abanoub Khalil](https://akstudio.me) — Senior WordPress & Webflow Developer
 
 ---
 
@@ -64,6 +65,8 @@ Activate this skill when the user:
 - Says: "convert this to a kit", "turn this mockup into a WordPress theme"
 - Asks for a multi-page Elementor output (more than one page template)
 - Mentions "Envato Elements", "Hello Elementor", "Theme Builder"
+- Says: "convert this to elementor", "build this in wordpress", "turn this design into a page"
+- Uploads any image/PDF and says "elementor", "wordpress", or "template" — even for a single page
 
 ---
 
@@ -275,6 +278,42 @@ section-wrapper (bg: dark)
 row container (4 cols, flex-wrap, space-around)
   └── counter widget × 4 (number, suffix, title, color)
 ```
+### Career Timeline / Work History Entry
+```
+inner container (column, border-left: 2px solid accent, padding-left: 20px)
+  └── inner container (row, gap: 8px)
+      └── text-editor widget    ← "OCT 2024 — PRESENT" (small, muted)
+      └── button widget (xs, pill, rgba bg) ← "FULL-TIME" badge
+  └── heading widget (h3)       ← Job title
+  └── text-editor widget        ← "Company — Location"
+  └── text-editor widget        ← Description paragraph
+  └── inner container (row, flex-wrap, gap: 8px)
+      └── button widget (xs, ghost) × N  ← tech stack tags
+```
+
+### Contact Info Panel
+```
+inner container (column, bg: card, border-radius: 12px, padding: 32px)
+  └── inner container (row) × N  ← one per info row
+      └── text-editor widget    ← label "LOCATION" (small, muted, uppercase)
+      └── text-editor widget    ← value "Cairo, Egypt"
+  └── inner container (row)     ← clickable row
+      └── text-editor widget    ← label "EMAIL"
+      └── button widget (link)  ← "hello@example.com" (href: mailto:)
+  └── alert widget              ← "✅ Currently available" status
+  └── button widget             ← "Book a discovery call" CTA (full-width)
+```
+
+### Logo Cloud / Partner Logos
+```
+image-carousel widget
+  slides_to_show: 5 (tablet: 3, mobile: 2)
+  autoplay: yes
+  navigation: none
+  images: [logo1, logo2, logo3, logo4, logo5]
+```
+
+
 
 ### Hero (2-col with image)
 ```
@@ -571,9 +610,10 @@ Run through before delivering:
 
 ## STEP 10 — USING THE PYTHON BUILDER
 
-The Python builder at `/home/claude/elementor-kit-builder/` handles all input parsing
+The Python builder (included in this repo under `builder/`) handles all input parsing
 and JSON assembly automatically. Claude should use it when running in a computer-use
-context. In chat-only contexts, Claude generates JSON directly using the schemas above.
+or Claude Code context. In chat-only contexts, Claude generates JSON directly using
+the schemas above.
 
 ### Install dependencies
 ```bash
@@ -678,6 +718,9 @@ Pre-built JSON patterns are in `templates/section_patterns/`:
 | services | navbar → hero → features → footer |
 | pricing | navbar → hero → pricing → cta → footer |
 | contact | navbar → hero → footer |
+| landing | navbar → hero → features → cta → footer |
+| team | navbar → hero → features → footer |
+| faq | navbar → hero → accordion → cta → footer |
 | blog | navbar → hero → posts (Pro) → footer |
 | portfolio | navbar → hero → portfolio (Pro) → footer |
 
